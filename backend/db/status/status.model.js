@@ -33,10 +33,24 @@ async function deleteStatus(id) {
   }
 }
 
+async function updateStatus(id, newContent) {
+  try {
+    const updatedStatus = await StatusModel.findByIdAndUpdate(
+        id,
+        { content: newContent },
+        { new: true }
+    );
+    return updatedStatus;
+  } catch (e) {
+    throw e;
+  }
+}
+
 module.exports = {
   createStatus,
   findStatusById,
   findStatusesByUsername,
   getAllStatuses,
-  deleteStatus
+  deleteStatus,
+  updateStatus
 };

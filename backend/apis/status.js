@@ -71,6 +71,34 @@ router.delete('/:id', async function(request, response) {
   }
 });
 
+// Update status
+router.put('/:id', async function(request, response) {
+  const username = request.cookies.username;
+
+  if (!username) {
+    return response.status(401).send("Must be logged in to update status");
+  }
+
+  try {
+    const decryptedUsername = jwt.verify(username, "HUNTERS_PASSWORD");
+    const status = await StatusModel.findStatusById(request.params.id);
+
+    if (!status) {
+      return response.status(404).send("Status not found");
+    }
+
+    if (status.username !== decryptedUsername) {
+      return response.status(403).send("Not authorized to update this status");
+    }
+
+    const updatedStatus = await StatusModel.updateStatus(request.params.id, request.body.content);
+    response.send(updatedStatus);
+  } catch (error) {
+    console.log('Error updating status:', error);
+    response.status(500).send(error.message);
+  }
+});
+
 // Get user's statuses
 router.get('/user/:username', async function(request, response) {
   try {
